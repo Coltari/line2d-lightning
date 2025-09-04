@@ -17,12 +17,12 @@ extends Node2D
 
 @onready var timer: Timer = $Timer
 @onready var lines: Node2D = $Lines
-@onready var button: Button = $VBoxContainer/Button
-@onready var ltime: LineEdit = $VBoxContainer/time
-@onready var length: LineEdit = $VBoxContainer/length
-@onready var lstrands: LineEdit = $VBoxContainer/strands
-@onready var lpoints: LineEdit = $VBoxContainer/points
-@onready var glow: HSlider = $VBoxContainer/glow
+@onready var button: Button = %Button
+@onready var ltime: AttributeSlider = %TimeAttributeSlider
+@onready var length: AttributeSlider = %AccuracyAttributeSlider
+@onready var lstrands: AttributeSlider = %StrandsAttributeSlider
+@onready var lpoints: AttributeSlider = %PointsAttributeSlider
+@onready var glow: AttributeSlider = %GlowAttributeSlider
 
 @onready var source: Sprite2D = $Source
 @onready var s_area_2d: Area2D = $Source/Area2D
@@ -37,17 +37,12 @@ func _ready() -> void:
 	s_area_2d.input_event.connect(source_grabbed)
 	t_area_2d.input_event.connect(target_grabbed)
 	glow.value = glow_intensity
-	ltime.text = str(time)
-	#length.text = str(strandlength)
-	length.text = str(accuracy)
-	lstrands.text = str(strands)
-	lpoints.text = str(points)
 	glow.value_changed.connect(glow_changed)
 	button.button_down.connect(_on_button_button_down)
-	ltime.text_changed.connect(value_changed.bind("time"))
-	length.text_changed.connect(value_changed.bind("length"))
-	lstrands.text_changed.connect(value_changed.bind("strands"))
-	lpoints.text_changed.connect(value_changed.bind("points"))
+	ltime.value_changed.connect(value_changed.bind("time"))
+	length.value_changed.connect(value_changed.bind("length"))
+	lstrands.value_changed.connect(value_changed.bind("strands"))
+	lpoints.value_changed.connect(value_changed.bind("points"))
 	timer.timeout.connect(stopemitting)
 	timer.wait_time = time
 	lines.position = source.position
@@ -107,7 +102,7 @@ func set_timer(val: float):
 func _on_button_button_down() -> void:
 	emit = true
 
-func value_changed(value : String, prop : String) -> void:
+func value_changed(value : float, prop : String) -> void:
 	match prop:
 		"time":
 			time = float(value)
