@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://bdf7n8172jmq"]
+
+[ext_resource type="Script" uid="uid://d323g585uoxuw" path="res://lightning.gd" id="1_wtcfe"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_wtcfe")
+emit = true
+time = 5.0
+strands = 3
+points = 5
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="Lines" type="Node2D" parent="."]
