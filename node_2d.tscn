@@ -15,7 +15,6 @@ glow_enabled = true
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_wtcfe")
-strands = 3
 
 [node name="Timer" type="Timer" parent="."]
 one_shot = true
@@ -43,7 +42,7 @@ placeholder_text = "time"
 [node name="length" type="LineEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(100, 25)
 layout_mode = 2
-placeholder_text = "length"
+placeholder_text = "accuracy"
 
 [node name="strands" type="LineEdit" parent="VBoxContainer"]
 custom_minimum_size = Vector2(100, 25)

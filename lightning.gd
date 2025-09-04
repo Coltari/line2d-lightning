@@ -9,10 +9,11 @@ extends Node2D
 	set(value):
 		time = value
 		set_timer(value)
-@export var strandlength : int = 5
-@export var strands : int = 5
-@export var points : int = 10
+#@export var strandlength : int = 5
+@export var strands : int = 3
+@export var points : int = 5
 @export var glow_intensity : float = 2.5
+@export var accuracy : int = 80
 
 @onready var timer: Timer = $Timer
 @onready var lines: Node2D = $Lines
@@ -37,7 +38,8 @@ func _ready() -> void:
 	t_area_2d.input_event.connect(target_grabbed)
 	glow.value = glow_intensity
 	ltime.text = str(time)
-	length.text = str(strandlength)
+	#length.text = str(strandlength)
+	length.text = str(accuracy)
 	lstrands.text = str(strands)
 	lpoints.text = str(points)
 	glow.value_changed.connect(glow_changed)
@@ -66,18 +68,32 @@ func _process(delta: float) -> void:
 			##sample points randomly for the length of the line from a sine wave
 			var lastPoint : Vector2 = Vector2(0,0)
 			l.add_point(lastPoint)
+			##figure out how long we need to be to reach the target
+			var distancetotarget : Vector2 = target.global_position-source.global_position
+			##set the value for the final point, based on target position +/- variance for accuracy
+			var hitpoint : Vector2 = (target.global_position - source.global_position) + Vector2(randf_range(-(100-accuracy),(100-accuracy)),randf_range(-(100-accuracy),(100-accuracy)))
 			for x in points:
+				##divide the distance by number of points +2 for the start and end
+				var increment : Vector2 = distancetotarget / (points + 2)
+				##traverse to this point in the sequence, include extra increment for the start point offset
+				var p : Vector2 = (increment * x) + increment
 				##add some variance to make the lines different
-				var rand_variance : int = randi_range(5,25)
-				var p : Vector2 = Vector2(sin((delta*rand_variance)+x)*(20*strandlength),cos((delta*rand_variance)+randf_range(0.75,2.0))*(20*strandlength))
-				if p.x < lastPoint.x:
-					p.x = lastPoint.x + (randf_range(5.0,10.0) * strandlength)
+				var rand_variance : float = 0.0
+				if x == 1:
+					rand_variance = randf_range(0.0,75.0)
+				else:
+					rand_variance = randf_range(-75.0,250.0)
+				p.x += rand_variance
+				#scatter the Y based on wave
+				var yrand_variance : float = randi_range(5,25)
+				p.y += cos((delta*yrand_variance)+randf_range(0.75,2.0))*100
 				##addpoints to curve and randomise the tangent a bit between -12 and 0
 				c.add_point(Vector2(randf_range(0.0,1.0),randf_range(0.0,1.0)),randi_range(-12,0),randi_range(-12,0))
 				l.width_curve = c
 				##add points to line
 				l.add_point(p)
 				lastPoint = p
+			l.add_point(hitpoint)
 
 func stopemitting():
 	emit = false
@@ -96,7 +112,8 @@ func value_changed(value : String, prop : String) -> void:
 		"time":
 			time = float(value)
 		"length":
-			strandlength = int(value)
+			#strandlength = int(value)
+			accuracy = int(value)
 		"strands":
 			strands = int(value)
 		"points":
@@ -109,10 +126,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if sourcepicked and event is InputEventMouseMotion:
 		source.position += event.relative
 		lines.position = source.position
-		lines.look_at(target.position)
+		#lines.look_at(target.position)
 	if targetpicked and event is InputEventMouseMotion:
 		target.position += event.relative
-		lines.look_at(target.position)
+		#lines.look_at(target.position)
 
 func source_grabbed(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.pressed:
