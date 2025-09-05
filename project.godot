@@ -10,7 +10,9 @@ config_version=5
 
 [application]
 
-config/name="Sine Lightning Test"
+config/name="Line2D Lightning"
+config/description="Demo for producing lightning effect using primarily Line2D node."
+config/tags=PackedStringArray("mechanic_test", "prototype")
 run/main_scene="uid://bdf7n8172jmq"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"

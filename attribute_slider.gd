@@ -12,16 +12,16 @@ var _value : float:
 		attribute = value
 		await until_ready()
 		attribute_label.text = attribute
-@export var min : float = 0.0:
+@export var minimum : float = 0.0:
 	set(value):
-		min = value
+		minimum = value
 		await until_ready()
-		h_slider.min_value = min
-@export var max : float = 100.0:
+		h_slider.min_value = minimum
+@export var maximum : float = 100.0:
 	set(value):
-		max = value
+		maximum = value
 		await until_ready()
-		h_slider.max_value = max
+		h_slider.max_value = maximum
 @export var step : float = 1.0:
 	set(value):
 		step = value
@@ -43,12 +43,12 @@ signal value_changed(new_value : float)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	attribute_label.text = attribute
-	h_slider.min_value = min
-	h_slider.max_value = max
+	h_slider.min_value = minimum
+	h_slider.max_value = maximum
 	h_slider.step = step
 	h_slider.value_changed.connect(on_value_changed)
 
-func on_value_changed(new_value : float) -> void:
+func on_value_changed(_new_value : float) -> void:
 	var text_value := str(snapped(value, 0.01))
 	value_label.text = text_value
 	value_changed.emit(value)
