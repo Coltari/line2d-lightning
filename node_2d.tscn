@@ -24,7 +24,7 @@ one_shot = true
 position = Vector2(305, 327)
 
 [node name="Source" type="Sprite2D" parent="."]
-position = Vector2(224, 287)
+position = Vector2(468, 96)
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_0e48y")
 
@@ -34,7 +34,7 @@ texture = ExtResource("2_0e48y")
 shape = SubResource("CircleShape2D_epypp")
 
 [node name="Target" type="Sprite2D" parent="."]
-position = Vector2(928, 286)
+position = Vector2(1042, 518)
 scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_0e48y")
 
@@ -59,43 +59,67 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 8
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/BoxContainer/PanelContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/BoxContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 10
 theme_override_constants/separation = 0
 
-[node name="Button" type="Button" parent="CanvasLayer/BoxContainer/PanelContainer/VBoxContainer"]
+[node name="Button" type="Button" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Emit"
 
-[node name="TimeAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="TimeAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Time"
 step = 0.1
 value = 3.0
 
-[node name="AccuracyAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="AccuracyAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Accuracy"
 step = 0.1
 
-[node name="StrandsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="StrandsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Strands"
 
-[node name="PointsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="PointsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Points"
 
-[node name="GlowAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="GlowAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Glow"
 step = 0.1
 value = 2.5
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ColorPicker" type="ColorPicker" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+picker_shape = 2
+sampler_visible = false
+color_modes_visible = false
+sliders_visible = false
+hex_visible = false
+presets_visible = false
+
+[node name="MarginContainer2" type="MarginContainer" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3

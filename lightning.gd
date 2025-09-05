@@ -22,6 +22,7 @@ extends Node2D
 @onready var strands_slider: AttributeSlider = %StrandsAttributeSlider
 @onready var points_slider: AttributeSlider = %PointsAttributeSlider
 @onready var glow: AttributeSlider = %GlowAttributeSlider
+@onready var color_picker: ColorPicker = %ColorPicker
 
 @onready var source: Sprite2D = $Source
 @onready var s_area_2d: Area2D = $Source/Area2D
@@ -30,6 +31,7 @@ extends Node2D
 
 var sourcepicked : bool = false
 var targetpicked : bool = false
+var lightningcolour : Color
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -40,12 +42,15 @@ func _ready() -> void:
 	accuracy_slider.value = accuracy
 	strands_slider.value = strands
 	points_slider.value = points
+	glow.minimum = 0.0
+	glow.maximum = 10.0
 	glow.value_changed.connect(glow_changed)
 	button.button_down.connect(_on_button_button_down)
 	time_slider.value_changed.connect(value_changed.bind("time"))
 	accuracy_slider.value_changed.connect(value_changed.bind("accuracy"))
 	strands_slider.value_changed.connect(value_changed.bind("strands"))
 	points_slider.value_changed.connect(value_changed.bind("points"))
+	color_picker.connect("color_changed",colour_changed)
 	timer.timeout.connect(stopemitting)
 	timer.wait_time = time
 	lines.position = source.position
@@ -60,7 +65,7 @@ func _process(delta: float) -> void:
 			var l = Line2D.new()
 			lines.add_child(l)
 			##add raw colour above HDR threshold so it glows
-			l.default_color = Color(glow_intensity,glow_intensity,glow_intensity,1.0)
+			l.default_color = lightningcolour + Color(glow_intensity,glow_intensity,glow_intensity,1.0)
 			##create a curve for adjusting the line thickness between points
 			var c = Curve.new()
 			##start at the beginning...
@@ -138,3 +143,6 @@ func target_grabbed(_viewport: Node, event: InputEvent, _shape_idx: int) -> void
 		targetpicked = true
 	if event is InputEventMouseButton and not event.pressed:
 		targetpicked = false
+
+func colour_changed(colour : Color) -> void:
+	lightningcolour = colour
