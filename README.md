@@ -4,6 +4,7 @@ quick demo for creating lightning effect using Line2D Node.
 Feel free to use as you see fit.
 
 ## Usage
+
 Lightning.tscn and lightning.gd are the key parts.
 
 you can drop this scene into another project and instantiate it followed by a setup() then start() method call.
