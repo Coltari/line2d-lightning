@@ -13,11 +13,10 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Attribute"
 
-[node name="ValueLabel" type="Label" parent="."]
+[node name="ValueLabel" type="LineEdit" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
 text = "1.0"
-horizontal_alignment = 1
 
 [node name="HSlider" type="HSlider" parent="."]
 unique_name_in_owner = true

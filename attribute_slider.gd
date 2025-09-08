@@ -35,7 +35,7 @@ var _value : float:
 		h_slider.value = new_value
 
 @onready var attribute_label: Label = %AttributeLabel
-@onready var value_label: Label = %ValueLabel
+@onready var value_label: LineEdit = %ValueLabel
 @onready var h_slider: HSlider = %HSlider
 
 signal value_changed(new_value : float)
@@ -47,6 +47,7 @@ func _ready() -> void:
 	h_slider.max_value = maximum
 	h_slider.step = step
 	h_slider.value_changed.connect(on_value_changed)
+	value_label.text_changed.connect(value_input)
 
 func on_value_changed(_new_value : float) -> void:
 	var text_value := str(snapped(value, 0.01))
@@ -56,3 +57,9 @@ func on_value_changed(_new_value : float) -> void:
 func until_ready() -> void:
 	if not is_node_ready():
 		await ready
+
+func value_input(new_text : String) -> void:
+	var float_value = clamp(float(new_text),minimum,maximum)
+	h_slider.value = float_value
+	value_label.text = str(float_value)
+	
