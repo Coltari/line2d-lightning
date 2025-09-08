@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var period: Timer = $Period
 @onready var bolts: Node2D = $Bolts
+@onready var rays: Node2D = $Rays
 
 var starting : bool = false
 var ending : bool = false
@@ -9,6 +10,7 @@ var toggle : bool = false
 var on : bool = false
 var time : float = 0.0
 var ticktimer : float = 0.0
+var damagetimer : float = 0.0
 
 var source : Vector2 
 var target : Vector2
@@ -18,11 +20,14 @@ var accuracy : int
 var glow : float
 var colour : Color
 var lifetime : float
+var damagetick : float
 
 var startcount: int = 0
 var endcount : int = 0
 
-func setup(source : Vector2, target : Vector2, strands : int, points : int, accuracy : int, glow : float, colour : Color, _lifetime : float = -1 ) -> void:
+signal hit_something(collider : Object)
+
+func setup(source : Vector2, target : Vector2, strands : int, points : int, accuracy : int, glow : float, colour : Color, _lifetime : float = -1, _damagetick : float = 1.0) -> void:
 	self.global_position = source
 	self.source = source
 	self.target = target
@@ -36,6 +41,7 @@ func setup(source : Vector2, target : Vector2, strands : int, points : int, accu
 		lifetime = _lifetime
 	else:
 		toggle = true
+	self.damagetick = _damagetick
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -48,10 +54,14 @@ func _process(delta: float) -> void:
 	time += delta
 	if on:
 		draw_lines()
+		check_ray_collision()
 		ticktimer += delta
 		if ticktimer > 0.025:
 			timer_tick()
 			ticktimer = 0.0
+		damagetimer += delta
+		if damagetimer >= damagetick:
+			damagetimer = 0.0 
 	else:
 		queue_free()
 
@@ -110,6 +120,8 @@ func generate_points() -> Array:
 func draw_lines() -> void:
 	for child in bolts.get_children():
 		child.queue_free()
+	for child in rays.get_children():
+		child.queue_free()
 	##create line2d nodes
 	for i in strands:
 		var l = Line2D.new()
@@ -122,9 +134,25 @@ func draw_lines() -> void:
 			##addpoints to curve and randomise the tangent a bit between -12 and 0
 			c.add_point(Vector2(randf_range(0.0,1.0),randf_range(0.0,1.0)),randi_range(-12,0),randi_range(-12,0))
 		l.width_curve = c
+		var last_point : Vector2
 		var line_points = generate_points()
 		for p in line_points:
 			l.add_point(p)
+			#if last_point not null, create ray cast
+			if last_point:
+				var r = RayCast2D.new()
+				rays.add_child(r)
+				r.position = last_point
+				r.set_collide_with_areas(true)
+				r.set_collide_with_bodies(true)
+				r.set_target_position(p-last_point)
+			last_point = p
+
+func check_ray_collision() -> void:
+	for r in rays.get_children():
+		if r.is_colliding():
+			hit_something.emit(r.get_collider())
+			break
 
 func timer_tick() -> void:
 	if starting:

@@ -9,3 +9,5 @@ script = ExtResource("1_cwqlr")
 one_shot = true
 
 [node name="Bolts" type="Node2D" parent="."]
+
+[node name="Rays" type="Node2D" parent="."]

@@ -59,7 +59,11 @@ func _on_button_button_down() -> void:
 	var l = LIGHTNING.instantiate()
 	l.setup(source.global_position,target.global_position,strands,points,accuracy,glow_intensity,lightningcolour,time)
 	lightning.add_child(l)
+	l.hit_something.connect(hit)
 	l.start()
+
+func hit(collider : Object) -> void:
+	print("hit ", collider)
 
 func value_changed(value : float, prop : String) -> void:
 	match prop:
