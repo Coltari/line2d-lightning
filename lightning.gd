@@ -59,9 +59,9 @@ func _process(delta: float) -> void:
 		if ticktimer > 0.025:
 			timer_tick()
 			ticktimer = 0.0
-		damagetimer += delta
-		if damagetimer >= damagetick:
-			damagetimer = 0.0 
+		#damagetimer += delta
+		#if damagetimer >= damagetick:
+		#	damagetimer = 0.0 
 	else:
 		queue_free()
 

@@ -1,4 +1,7 @@
 # line2d-lightning
+
+![Lightning](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcGRyNGF0MHliMGJ2emcybXR0ZGJwNTNkN21iaXNqbzNjbTg4NTFkdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QlPLPtX2cicxzFRpfY/giphy.gif)
+
 quick demo for creating lightning effect using Line2D Node.
 
 Feel free to use as you see fit.
