@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://c16xm6kupa2de"]
+
+[ext_resource type="Script" uid="uid://8pm72by4xnoy" path="res://lightning.gd" id="1_cwqlr"]
+
+[node name="Lightning" type="Node2D"]
+script = ExtResource("1_cwqlr")
+
+[node name="Period" type="Timer" parent="."]
+one_shot = true
+
+[node name="Bolts" type="Node2D" parent="."]

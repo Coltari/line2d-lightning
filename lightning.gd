@@ -1,148 +1,163 @@
 extends Node2D
 
-@export var emit : bool = false :
-	set(value):
-		emit = value
-		if value:
-			timer.start()
-@export var time : float = 10.0 :
-	set(value):
-		time = value
-		set_timer(value)
-@export var strands : int = 3
-@export var points : int = 5
-@export var glow_intensity : float = 2.5
-@export var accuracy : int = 80
+@onready var period: Timer = $Period
+@onready var bolts: Node2D = $Bolts
 
-@onready var timer: Timer = $Timer
-@onready var lines: Node2D = $Lines
-@onready var button: Button = %Button
-@onready var time_slider: AttributeSlider = %TimeAttributeSlider
-@onready var accuracy_slider: AttributeSlider = %AccuracyAttributeSlider
-@onready var strands_slider: AttributeSlider = %StrandsAttributeSlider
-@onready var points_slider: AttributeSlider = %PointsAttributeSlider
-@onready var glow: AttributeSlider = %GlowAttributeSlider
-@onready var color_picker: ColorPicker = %ColorPicker
+var starting : bool = false
+var ending : bool = false
+var toggle : bool = false
+var on : bool = false
+var time : float = 0.0
+var ticktimer : float = 0.0
 
-@onready var source: Sprite2D = $Source
-@onready var s_area_2d: Area2D = $Source/Area2D
-@onready var target: Sprite2D = $Target
-@onready var t_area_2d: Area2D = $Target/Area2D
+var source : Vector2 
+var target : Vector2
+var strands : int
+var points : int
+var accuracy : int
+var glow : float
+var colour : Color
+var lifetime : float
 
-var sourcepicked : bool = false
-var targetpicked : bool = false
-var lightningcolour : Color
+var startcount: int = 0
+var endcount : int = 0
+
+func setup(source : Vector2, target : Vector2, strands : int, points : int, accuracy : int, glow : float, colour : Color, _lifetime : float = -1 ) -> void:
+	self.global_position = source
+	self.source = source
+	self.target = target
+	self.strands = strands
+	self.points = points
+	self.accuracy = accuracy
+	self.glow = glow
+	self.colour = colour
+	if _lifetime > 0:
+		toggle = false
+		lifetime = _lifetime
+	else:
+		toggle = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	s_area_2d.input_event.connect(source_grabbed)
-	t_area_2d.input_event.connect(target_grabbed)
-	glow.value = glow_intensity
-	time_slider.value = time
-	accuracy_slider.value = accuracy
-	strands_slider.value = strands
-	points_slider.value = points
-	glow.minimum = 0.0
-	glow.maximum = 10.0
-	glow.value_changed.connect(glow_changed)
-	button.button_down.connect(_on_button_button_down)
-	time_slider.value_changed.connect(value_changed.bind("time"))
-	accuracy_slider.value_changed.connect(value_changed.bind("accuracy"))
-	strands_slider.value_changed.connect(value_changed.bind("strands"))
-	points_slider.value_changed.connect(value_changed.bind("points"))
-	color_picker.connect("color_changed",colour_changed)
-	timer.timeout.connect(stopemitting)
-	timer.wait_time = time
-	lines.position = source.position
+	period.timeout.connect(end)
+	if !toggle:
+		period.wait_time = lifetime
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	for c in lines.get_children():
-		c.queue_free()
-	if emit:
-		##create line2d nodes
-		for i in strands:
-			var l = Line2D.new()
-			lines.add_child(l)
-			##add raw colour above HDR threshold so it glows
-			l.default_color = lightningcolour + Color(glow_intensity,glow_intensity,glow_intensity,1.0)
-			##create a curve for adjusting the line thickness between points
-			var c = Curve.new()
-			##start at the beginning...
-			l.add_point(Vector2(0,0))
-			##figure out how long we need to be to reach the target
-			var distancetotarget : Vector2 = target.global_position-source.global_position
-			##set the value for the final point, based on target position +/- variance for accuracy
-			var hitpoint : Vector2 = (target.global_position - source.global_position) + Vector2(randf_range(-(100-accuracy),(100-accuracy)),randf_range(-(100-accuracy),(100-accuracy)))
-			##sample points randomly for the length of the line from a wave
-			for x in points:
-				##divide the distance by number of points +2 for the start and end
-				var increment : Vector2 = distancetotarget / (points + 2)
-				##traverse to this point in the sequence, +1 for the start point offset
-				var p : Vector2 = (increment * (x +1))
-				##add some variance to make the lines different
-				var rand_variance : float = 0.0
-				if x == 1:
-					rand_variance = randf_range(0.0,75.0)
-				else:
-					rand_variance = randf_range(-75.0,250.0)
-				p.x += rand_variance
-				#scatter the Y based on wave
-				var yrand_variance : float = randi_range(5,25)
-				p.y += cos((delta*yrand_variance)+randf_range(0.75,2.0))*100
-				##addpoints to curve and randomise the tangent a bit between -12 and 0
-				c.add_point(Vector2(randf_range(0.0,1.0),randf_range(0.0,1.0)),randi_range(-12,0),randi_range(-12,0))
-				l.width_curve = c
-				##add points to line
-				l.add_point(p)
-			l.add_point(hitpoint)
+	time += delta
+	if on:
+		draw_lines()
+		ticktimer += delta
+		if ticktimer > 0.025:
+			timer_tick()
+			ticktimer = 0.0
+	else:
+		queue_free()
 
-func stopemitting() -> void:
-	emit = false
-	for child in lines.get_children():
+#on start
+func start() -> void:
+	starting = true
+	on = true
+	if !toggle:
+		period.start()
+
+func generate_points() -> Array:
+	var result : Array
+	##start at the beginning...
+	if !ending:
+		result.append(Vector2(0,0))
+	##figure out how long we need to be to reach the target
+	var distancetotarget : Vector2 = target-source
+	##set the value for the final point, based on target position +/- variance for accuracy
+	var hitpoint : Vector2 = (target - source) + Vector2(randf_range(-(100-accuracy),(100-accuracy)),randf_range(-(100-accuracy),(100-accuracy)))
+	##sample points randomly for the length of the line from a wave
+	for x in points:
+		##divide the distance by number of points +2 for the start and end
+		var increment : Vector2 = distancetotarget / (points + 2)
+		##traverse to this point in the sequence, +1 for the start point offset
+		var p : Vector2 = (increment * (x +1))
+		##add some variance to make the lines different
+		var rand_variance : float = 0.0
+		#these numbers are arbitrary, tweak to see what feels good.
+		if x == 1:
+			if increment.x > 0:
+				rand_variance = randf_range(0.0,75.0)
+			else:
+				rand_variance = randf_range(-75.0,0.0)
+		else:
+			if increment.x > 0:
+				rand_variance = randf_range(-75.0,250.0)
+			else:
+				rand_variance = randf_range(-250.0,75.0)
+		p.x += rand_variance
+		#scatter the Y based on wave
+		var yrand_variance : float = randi_range(5,25)
+		p.y += cos((time*yrand_variance)+randf_range(0.75,2.0))*100
+		##add points to line
+		if starting:
+			if x <= startcount:
+				result.append(p)
+		elif ending:
+			if x >= endcount:
+				result.append(p)
+		else:
+			result.append(p)
+	if !starting:
+		result.append(hitpoint)
+	return result
+
+func draw_lines() -> void:
+	for child in bolts.get_children():
 		child.queue_free()
+	##create line2d nodes
+	for i in strands:
+		var l = Line2D.new()
+		bolts.add_child(l)
+		##add raw colour above HDR threshold so it glows
+		l.default_color = colour + Color(glow,glow,glow,1.0)
+		##create a curve for adjusting the line thickness between points
+		var c = Curve.new()
+		for x in points:
+			##addpoints to curve and randomise the tangent a bit between -12 and 0
+			c.add_point(Vector2(randf_range(0.0,1.0),randf_range(0.0,1.0)),randi_range(-12,0),randi_range(-12,0))
+		l.width_curve = c
+		var line_points = generate_points()
+		for p in line_points:
+			l.add_point(p)
 
-func set_timer(val: float):
-	if timer:
-		timer.wait_time = val
+func timer_tick() -> void:
+	if starting:
+		startcount+=1
+		if startcount == points:
+			starting = false
+	if ending:
+		endcount+=1
+		if endcount == points:
+			ending = false
+			on = false
 
-func _on_button_button_down() -> void:
-	emit = true
+func end() -> void:
+	ending = true
 
-func value_changed(value : float, prop : String) -> void:
-	match prop:
-		"time":
-			time = float(value)
-		"accuracy":
-			accuracy = int(value)
-		"strands":
-			strands = int(value)
-		"points":
-			points = int(value)
+func update_source(source: Vector2) -> void:
+	self.source = source
+	self.global_position = source
 
-func glow_changed(value : float) -> void:
-	glow_intensity = value
+func update_target(target: Vector2) -> void:
+	self.target = target
 
-func _unhandled_input(event: InputEvent) -> void:
-	if sourcepicked and event is InputEventMouseMotion:
-		source.position += event.relative
-		lines.position = source.position
-		#lines.look_at(target.position)
-	if targetpicked and event is InputEventMouseMotion:
-		target.position += event.relative
-		#lines.look_at(target.position)
+func update_strands(lines : int) -> void:
+	self.strands = lines
 
-func source_grabbed(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		sourcepicked = true
-	if event is InputEventMouseButton and not event.pressed:
-		sourcepicked = false
+func update_points(points : int) -> void:
+	self.points = points
 
-func target_grabbed(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if event is InputEventMouseButton and event.pressed:
-		targetpicked = true
-	if event is InputEventMouseButton and not event.pressed:
-		targetpicked = false
+func update_accuracy(accuracy : int) -> void:
+	self.accuracy = accuracy
 
-func colour_changed(colour : Color) -> void:
-	lightningcolour = colour
+func update_glow(glow : float) -> void:
+	self.glow = glow
+
+func update_colour(colour : Color) -> void:
+	self.colour = colour

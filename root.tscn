@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://bdf7n8172jmq"]
 
-[ext_resource type="Script" uid="uid://d323g585uoxuw" path="res://lightning.gd" id="1_wtcfe"]
-[ext_resource type="Texture2D" uid="uid://43vpon1kdw1c" path="res://icon.svg" id="2_0e48y"]
-[ext_resource type="PackedScene" uid="uid://dwrw4mrmxttyv" path="res://attribute_slider.tscn" id="3_epypp"]
+[ext_resource type="Script" uid="uid://d323g585uoxuw" path="res://root.gd" id="1_vvh5c"]
+[ext_resource type="Texture2D" uid="uid://43vpon1kdw1c" path="res://icon.svg" id="2_28aoi"]
+[ext_resource type="PackedScene" uid="uid://dwrw4mrmxttyv" path="res://attribute_slider.tscn" id="3_jnlp7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_epypp"]
 radius = 64.1249
@@ -15,18 +15,12 @@ background_mode = 3
 glow_enabled = true
 
 [node name="Node2D" type="Node2D"]
-script = ExtResource("1_wtcfe")
-
-[node name="Timer" type="Timer" parent="."]
-one_shot = true
-
-[node name="Lines" type="Node2D" parent="."]
-position = Vector2(305, 327)
+script = ExtResource("1_vvh5c")
 
 [node name="Source" type="Sprite2D" parent="."]
 position = Vector2(468, 96)
 scale = Vector2(0.25, 0.25)
-texture = ExtResource("2_0e48y")
+texture = ExtResource("2_28aoi")
 
 [node name="Area2D" type="Area2D" parent="Source"]
 
@@ -36,7 +30,7 @@ shape = SubResource("CircleShape2D_epypp")
 [node name="Target" type="Sprite2D" parent="."]
 position = Vector2(1042, 518)
 scale = Vector2(0.25, 0.25)
-texture = ExtResource("2_0e48y")
+texture = ExtResource("2_28aoi")
 
 [node name="Area2D" type="Area2D" parent="Target"]
 
@@ -73,30 +67,30 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Emit"
 
-[node name="TimeAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="TimeAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_jnlp7")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Time"
 step = 0.1
 value = 3.0
 
-[node name="AccuracyAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="AccuracyAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_jnlp7")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Accuracy"
 step = 0.1
 
-[node name="StrandsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="StrandsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_jnlp7")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Strands"
 
-[node name="PointsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="PointsAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_jnlp7")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Points"
 
-[node name="GlowAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_epypp")]
+[node name="GlowAttributeSlider" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer" instance=ExtResource("3_jnlp7")]
 unique_name_in_owner = true
 layout_mode = 2
 attribute = "Glow"
@@ -123,3 +117,5 @@ presets_visible = false
 [node name="MarginContainer2" type="MarginContainer" parent="CanvasLayer/BoxContainer/PanelContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="Lightning" type="Node2D" parent="."]
